@@ -190,8 +190,9 @@ select option{color:var(--ink)}
 .lane{min-height:48px;border-radius:16px;padding:4px;transition:background .15s}
 .lane.over{background:rgba(251,244,228,.1)}
 .tiles{display:grid;gap:8px}
-.tiles.two{grid-template-columns:1fr 1fr}
-@media(max-width:1000px){.tiles.two{grid-template-columns:1fr}}
+.em{flex:none;font-size:15px;line-height:1.3}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.legend span{font-size:12px;font-weight:700;color:var(--ivory-2);padding:4px 10px 4px 12px;border-radius:999px;background:rgba(251,244,228,.08);box-shadow:inset 3px 0 0 var(--c)}
 .tile{display:flex;align-items:flex-start;gap:6px;background:var(--ivory);color:var(--ink);border-radius:14px;padding:9px 8px 9px 6px;font-size:15px;line-height:1.3;font-weight:500;user-select:none}
 .tile .h{flex:none;cursor:grab;color:var(--ink-soft);opacity:.45;touch-action:none;padding:1px 3px;font-size:15px;line-height:1.3;letter-spacing:-3px}
 .tile .check{width:22px;height:22px;margin-top:0}
@@ -247,17 +248,6 @@ select option{color:var(--ink)}
     <div class="head"><div><h2>This week</h2><p>One column each, every week. Photos go straight in from your phone.</p></div>
       <button class="btn" onclick="addWeek()">Start a new week</button></div>
     <div id="weeks"></div>
-  </section>
-
-  <section class="panel" data-p="steps">
-    <div class="head"><div><h2>Next steps</h2><p>The short list of what we said we'd do.</p></div></div>
-    <div class="thu"><span>Date night is</span><b>every Thursday</b></div>
-    <div class="card2"><h3>To do</h3>
-      <form class="add" style="margin-bottom:10px" onsubmit="return addItem(event,'steps')"><input placeholder="Add a next step" required><button class="btn small">Add</button></form>
-      <div class="list" id="steps"></div></div>
-    <div class="card2"><h3>The next few weeks of eating</h3><p class="note">General gout-friendly guidance, not medical advice. One list is the strict version, the other keeps only the parts that make sense for both of us.</p>
-      <div class="cols2"><div><div class="vlabel" id="dietALabel"></div><div class="list" id="dietA"></div></div><div><div class="vlabel like" id="dietBLabel"></div><div class="list" id="dietB"></div></div></div>
-      <form class="add" style="margin-top:14px" onsubmit="return addItem(event,'diet')"><input placeholder="Add a rule" required><select name="g" id="dietSel"></select><button class="btn small">Add</button></form></div>
   </section>
 
   <section class="panel" data-p="dates">
@@ -348,29 +338,7 @@ function seed(){
     settings:{a:'Nick',b:'Sue',caption:'Some time apart and everything we are building in the meantime',hq:'Our Dating Activity Center'},
     weeks:[{id:uid(),week:mondayOf(new Date()),e:{},p:{}}],
     bucket:[],
-    steps:[
-      {id:uid(),t:'Nick sends Sue the gout diet (it\'s below)',done:false},
-      {id:uid(),t:'Pick a game to play on dates and through the week',done:false},
-      {id:uid(),t:'Decide what next Thursday\'s date night is',done:false},
-    ],
-    dietA:[
-      {id:uid(),t:'No alcohol, beer and liquor especially',done:false},
-      {id:uid(),t:'No sugary drinks, juice, or anything with high-fructose corn syrup',done:false},
-      {id:uid(),t:'No shellfish, anchovies, sardines, or organ meats',done:false},
-      {id:uid(),t:'Red meat only in small portions, a couple of times a week at most',done:false},
-      {id:uid(),t:'Lots of water through the day',done:false},
-      {id:uid(),t:'Low-fat dairy is fine and may actually help',done:false},
-      {id:uid(),t:'Cherries, vegetables, whole grains, beans, and coffee are all good',done:false},
-    ],
-    dietB:[
-      {id:uid(),t:'No alcohol',done:false},
-      {id:uid(),t:'No sugary drinks or juice',done:false},
-      {id:uid(),t:'Less red meat, more fish, beans, and vegetables',done:false},
-      {id:uid(),t:'Lots of water',done:false},
-      {id:uid(),t:'Cherries and whole grains, same as Nick',done:false},
-      {id:uid(),t:'Same dinners as Nick when we cook together, shellfish allowed',done:false},
-    ],
-        movies:[],
+    movies:[],
     games:{log:[],next:[]},
     map:['Spain','Morocco','Colombia','United States of America','Argentina','Portugal','Netherlands'],
     dates:[
@@ -515,7 +483,10 @@ function renderSorter(col){
     <div class="meta"><span>${items.length} left of ${total}</span>${lastSort&&lastSort.col===col?`<button class="btn ghost small" onclick="undoSort()">Undo last</button>`:'<span></span>'}</div></div>`;
   wireDrag(document.getElementById(col+'Card'),col,a.id);
 }
-const tile=(col,x)=>`<div class="tile ${x.done?'done':''}" data-id="${x.id}"><span class="h" title="Drag">⋮⋮</span>${'done'in x?`<button class="check" onclick="toggle('${col}','${x.id}')" aria-label="Done">${x.done?'✓':''}</button>`:''}<div class="t">${linkify(x.t)}</div><button class="x" onclick="del('${col}','${x.id}')" aria-label="Remove">×</button></div>`;
+const CATS={food:['🍳','#F05A28','Food'],games:['🎲','#8B6BEA','Games'],travel:['🗺️','#22B37F','Travel'],watch:['🎬','#E4468F','Watch & read'],create:['🎨','#F5B82E','Make & plan'],talk:['💬','#3FA0E8','Talk'],out:['🌅','#19B0BF','Out & about']};
+const CATK=[['food',/cook|recipe|taste|takeout|dinner|snack|wine|cocktail|mocktail|ingredient|chef|dish|meal|market|restaurant|food|eat|coffee|tasting/i],['games',/game|trivia|board|bracket|codenames|catan|scrabble|debate|20 questions|competitive|golf|bowling|darts/i],['travel',/trip|travel|map|country|passport|city|cities|weekend|sunrise|revisit|somewhere/i],['watch',/movie|watch|museum|nostalgia|review|read|story|article|chapter|playlist|karaoke|song/i],['create',/draw|surprise|swap|dress|decade|fantasy|show and tell|plan/i],['talk',/talk|dare|challenge|questions|month|work|object|story/i]];
+function catOf(t){for(const [k,r] of CATK)if(r.test(t))return k;return 'out'}
+const tile=(col,x)=>{const c=col==='dates'?CATS[catOf(x.t)]:null;return `<div class="tile ${x.done?'done':''}" data-id="${x.id}"${c?` style="box-shadow:inset 4px 0 0 ${c[1]}"`:''}><span class="h" title="Drag">⋮⋮</span>${c?`<span class="em">${c[0]}</span>`:''}${'done'in x?`<button class="check" onclick="toggle('${col}','${x.id}')" aria-label="Done">${x.done?'✓':''}</button>`:''}<div class="t">${linkify(x.t)}</div><button class="x" onclick="del('${col}','${x.id}')" aria-label="Remove">×</button></div>`};
 const byO=(a,b)=>(a.o||0)-(b.o||0);
 function renderBucket(){
   const el=document.getElementById('bucketList');const lanes=['Adventure','Business','Life'];
@@ -531,15 +502,9 @@ function renderDates(){
   const group=(g,v,label)=>{const rows=S.dates.filter(x=>x.g===g&&x.v===v).sort(byO);
     return `<div class="vgroup"><div class="vlabel ${v}">${label}<span> · ${rows.length}</span></div><div class="lane" data-lane="${g}|${v}"><div class="tiles two">${rows.map(x=>tile('dates',x)).join('')||`<div class="empty" style="padding:12px;grid-column:1/-1">Drag something here</div>`}</div></div></div>`};
   const skipped=S.dates.filter(x=>x.v==='skip').length;
-  el.innerHTML=`<div class="cols2">${lanes.map(g=>`<div><div class="lanehead">${g}<small>${S.dates.filter(x=>x.g===g&&x.v&&x.v!=='skip').length}</small></div>${group(g,'love','Love it')}${group(g,'like','Like it')}${SHOWSKIP?group(g,'skip','Skipped'):''}</div>`).join('')}</div>
+  el.innerHTML=`<div class="legend">${Object.values(CATS).map(([e,c,n])=>`<span style="--c:${c}">${e} ${n}</span>`).join('')}</div><div class="cols2">${lanes.map(g=>`<div><div class="lanehead">${g}<small>${S.dates.filter(x=>x.g===g&&x.v&&x.v!=='skip').length}</small></div>${group(g,'love','Love it')}${group(g,'like','Like it')}${SHOWSKIP?group(g,'skip','Skipped'):''}</div>`).join('')}</div>
     ${skipped?`<button class="btn ghost small" style="margin-top:8px" onclick="SHOWSKIP=!SHOWSKIP;render()">${SHOWSKIP?'Hide':'Show'} the ${skipped} skipped</button>`:''}`;
   makeSortable(el,'dates');
-}
-function renderSteps(){
-  const st=S.settings;const list=(col,id)=>{document.getElementById(id).innerHTML=coll(col).map(x=>`<div class="item ${x.done?'done':''}"><button class="check" onclick="toggle('${col}','${x.id}')">${x.done?'✓':''}</button><div class="t">${linkify(x.t)}</div><button class="x" onclick="del('${col}','${x.id}')">×</button></div>`).join('')||`<div class="empty">Nothing here.</div>`};
-  list('steps','steps');list('dietA','dietA');list('dietB','dietB');
-  document.getElementById('dietALabel').textContent=st.a;document.getElementById('dietBLabel').textContent=st.b;
-  document.getElementById('dietSel').innerHTML=`<option value="dietA">${esc(st.a)}</option><option value="dietB">${esc(st.b)}</option>`;
 }
 /* drag to reorder */
 function makeSortable(root,col){root.querySelectorAll('.tile .h').forEach(h=>h.addEventListener('pointerdown',e=>startDrag(e,h.closest('.tile'),root,col)))}
@@ -563,7 +528,7 @@ function render(){
   document.getElementById('coverSub').textContent=st.caption;
   const hq=document.getElementById('coverHq');hq.textContent=st.hq;hq.style.display=st.hq?'':'none';
   document.title=`${st.a} & ${st.b}`;
-  const tabs=[['checkins','This week',S.weeks.length],['steps','Next steps',S.steps.filter(x=>!x.done).length],['dates','Date nights',S.dates.filter(x=>x.v==='love').length],['bucket','Bucket list',S.bucket.filter(x=>!x.done).length],['movies','Movies',S.movies.filter(x=>!x.done).length],['games','Games',S.games.log.length],['map','Map',S.map.length],['settings','Settings','']];
+  const tabs=[['checkins','This week',S.weeks.length],['dates','Date nights',S.dates.filter(x=>x.v==='love').length],['bucket','Bucket list',S.bucket.filter(x=>!x.done).length],['movies','Movies',S.movies.filter(x=>!x.done).length],['games','Games',S.games.log.length],['map','Map',S.map.length],['settings','Settings','']];
   document.getElementById('tabs').innerHTML=tabs.map(([p,l,n])=>`<button class="tab" role="tab" data-p="${p}" onclick="show('${p}')">${l}${n?`<span class="n">${n}</span>`:''}</button>`).join('');
   const ae=document.activeElement;
   if(!ae||ae.tagName!=='TEXTAREA'){
@@ -577,7 +542,6 @@ function render(){
   }
   renderBucket();
   renderDates();
-  renderSteps();
   document.getElementById('movies').innerHTML=S.movies.length?`<div class="reel">${S.movies.map(m=>`<div class="ticket ${m.done?'done':''}"><div class="title">${esc(m.t)}</div><div class="meta"><span>${m.done?'Watched':'Up next'}</span><button class="watched" onclick="toggle('movies','${m.id}')">${m.done?'Unwatch':'We watched it'}</button></div><button class="x" onclick="del('movies','${m.id}')" aria-label="Remove">×</button></div>`).join('')}</div>`
     :`<div class="empty"><b>The list is empty.</b> Each of you add one to start.</div>`;
   // games
@@ -608,7 +572,7 @@ function renderMap(){
 /* ---------- boot ---------- */
 const OLD_BUCKET=['Plan a trip where Sue picks the food and Nick picks the activities','Go somewhere neither of us has been, no itinerary, just wander','Recreate a meal from our favorite trip so far','Plan a weekend around one specific dish we both want to try','Take a cooking class together in a city neither of us has been to','Find a hole-in-the-wall restaurant with zero online reviews and rate it ourselves','Cook the same recipe separately on a video call and compare','Take a food tour in a new city','Do a blind taste test (wine, coffee, hot sauce, anything)','Cook a full meal from a country we haven\'t visited','Find a local farmers market wherever we travel and cook with what we find','Board game tournament weekend, best record wins a prize','Learn a new board game neither of us has played','Rematch of whatever game one of us is most smug about winning','Take a class together neither of us is naturally good at'];
 function normalize(S){
-  const sd=seed();S.games=S.games||{log:[],next:[]};S.map=S.map||sd.map;S.steps=S.steps||sd.steps;S.dietA=S.dietA||sd.dietA;S.dietB=S.dietB||sd.dietB;S.bucket=S.bucket||[];S.dates=S.dates||[];
+  const sd=seed();S.games=S.games||{log:[],next:[]};S.map=S.map||sd.map;S.bucket=S.bucket||[];S.dates=S.dates||[];
   if(!S.v||S.v<3){
     const old=new Set(OLD_BUCKET),gmap={Travel:'Adventure',Food:'Life',Games:'Life',Other:'Life'};
     S.bucket=S.bucket.filter(x=>!old.has(x.t)).map((x,i)=>({id:x.id,t:x.t,done:!!x.done,g:gmap[x.g]||(['Adventure','Business','Life'].includes(x.g)?x.g:'Life'),o:i}));
