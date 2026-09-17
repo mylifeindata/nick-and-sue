@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nick & Sue</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -483,10 +485,10 @@ function renderSorter(col){
     <div class="meta"><span>${items.length} left of ${total}</span>${lastSort&&lastSort.col===col?`<button class="btn ghost small" onclick="undoSort()">Undo last</button>`:'<span></span>'}</div></div>`;
   wireDrag(document.getElementById(col+'Card'),col,a.id);
 }
-const CATS={food:['🍳','#F05A28','Food'],games:['🎲','#8B6BEA','Games'],travel:['🗺️','#22B37F','Travel'],watch:['🎬','#E4468F','Watch & read'],create:['🎨','#F5B82E','Make & plan'],talk:['💬','#3FA0E8','Talk'],out:['🌅','#19B0BF','Out & about']};
-const CATK=[['food',/cook|recipe|taste|takeout|dinner|snack|wine|cocktail|mocktail|ingredient|chef|dish|meal|market|restaurant|food|eat|coffee|tasting/i],['games',/game|trivia|board|bracket|codenames|catan|scrabble|debate|20 questions|competitive|golf|bowling|darts/i],['travel',/trip|travel|map|country|passport|city|cities|weekend|sunrise|revisit|somewhere/i],['watch',/movie|watch|museum|nostalgia|review|read|story|article|chapter|playlist|karaoke|song/i],['create',/draw|surprise|swap|dress|decade|fantasy|show and tell|plan/i],['talk',/talk|dare|challenge|questions|month|work|object|story/i]];
+const CATS={food:['🍳','#F05A28','Food','#FCE3D6'],games:['🎲','#8B6BEA','Games','#E8E1FB'],travel:['🗺️','#22B37F','Travel','#D5F2E5'],watch:['🎬','#E4468F','Watch & read','#FBDBE8'],create:['🎨','#F5B82E','Make & plan','#FCEFC9'],talk:['💬','#3FA0E8','Talk','#D9EBFB'],out:['🌅','#19B0BF','Out & about','#D3F0F3']};
+const CATK=[['games',/\b(game|games|trivia|board|bracket|codenames|catan|scrabble|debate|20 questions|competitive|golf|bowling|darts)\b/i],['travel',/\b(trip|travel|map|country|passport|city|cities|weekend|sunrise|revisit|somewhere)\b/i],['food',/\b(cook|cooking|recipe|taste|takeout|dinner|snack|wine|cocktail|mocktail|ingredient|chef|dish|meal|market|restaurant|food|eat|coffee|tasting|budget)\b/i],['watch',/\b(movie|watch|museum|nostalgia|review|reviews|read|story|article|chapter|playlist|karaoke|song)\b/i],['create',/\b(draw|surprise|swap|dress|decade|fantasy|show and tell|plan)\b/i],['talk',/\b(talk|dare|challenge|questions|month|work|object)\b/i]];
 function catOf(t){for(const [k,r] of CATK)if(r.test(t))return k;return 'out'}
-const tile=(col,x)=>{const c=col==='dates'?CATS[catOf(x.t)]:null;return `<div class="tile ${x.done?'done':''}" data-id="${x.id}"${c?` style="box-shadow:inset 4px 0 0 ${c[1]}"`:''}><span class="h" title="Drag">⋮⋮</span>${c?`<span class="em">${c[0]}</span>`:''}${'done'in x?`<button class="check" onclick="toggle('${col}','${x.id}')" aria-label="Done">${x.done?'✓':''}</button>`:''}<div class="t">${linkify(x.t)}</div><button class="x" onclick="del('${col}','${x.id}')" aria-label="Remove">×</button></div>`};
+const tile=(col,x)=>{const c=col==='dates'?CATS[catOf(x.t)]:null;return `<div class="tile ${x.done?'done':''}" data-id="${x.id}"${c?` style="background:${c[3]};box-shadow:inset 4px 0 0 ${c[1]}"`:''}><span class="h" title="Drag">⋮⋮</span>${c?`<span class="em">${c[0]}</span>`:''}${'done'in x?`<button class="check" onclick="toggle('${col}','${x.id}')" aria-label="Done">${x.done?'✓':''}</button>`:''}<div class="t">${linkify(x.t)}</div><button class="x" onclick="del('${col}','${x.id}')" aria-label="Remove">×</button></div>`};
 const byO=(a,b)=>(a.o||0)-(b.o||0);
 function renderBucket(){
   const el=document.getElementById('bucketList');const lanes=['Adventure','Business','Life'];
