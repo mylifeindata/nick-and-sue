@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nick & Sue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#183F32; --green-deep:#0F2B22; --green-soft:#2C5E4B;
+  --ivory:#FBF4E4; --ivory-2:#F1E6CE;
+  --pink:#E4468F; --pink-soft:#F7A8CC;
+  --orange:#F05A28; --marigold:#F5B82E; --sky:#7FB7D6;
+  --ink:#16221D; --ink-soft:#5B6B63;
+  --serif:'Fraunces',Georgia,serif; --sans:'Manrope',system-ui,sans-serif;
+  --r:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--green);color:var(--ivory);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,textarea,select{font:inherit;color:inherit}
+::selection{background:var(--pink);color:#fff}
+
+/* cover */
+.cover{position:relative;height:100svh;min-height:560px;overflow:hidden;background:var(--green-deep)}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.cover .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,43,34,.05) 35%,rgba(15,43,34,.55) 70%,var(--green) 100%)}
+.cover .words{position:absolute;left:0;right:0;bottom:0;padding:0 clamp(20px,5vw,72px) clamp(28px,6vh,64px)}
+.cover h1{font-family:var(--serif);font-weight:500;font-size:clamp(48px,9vw,118px);line-height:.9;margin:0;letter-spacing:-.02em;color:var(--ivory)}
+.cover h1 em{font-style:italic;font-weight:300;color:var(--pink-soft)}
+.cover .sub{margin:18px 0 0;font-size:clamp(14px,1.9vw,21px);color:var(--ivory-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 80px)}
+@media(max-width:560px){.cover .sub{white-space:normal}}
+.cover .hq{margin-top:22px;display:inline-block;background:var(--pink);color:#fff;padding:10px 18px;border-radius:999px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(17px,2vw,22px)}
+.cover .enter{position:absolute;right:clamp(20px,5vw,72px);bottom:clamp(28px,6vh,64px);width:54px;height:54px;border-radius:50%;background:var(--ivory);color:var(--green);display:grid;place-items:center;transition:transform .2s}
+.cover .enter:hover{transform:translateY(4px)}
+
+/* tabs */
+.bar{position:sticky;top:0;z-index:5;background:var(--green);padding:14px clamp(14px,4vw,56px);border-bottom:1px solid rgba(251,244,228,.14)}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:1100px;margin:0 auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;padding:10px 18px;border-radius:999px;font-weight:600;color:var(--ivory-2);opacity:.8;transition:.15s}
+.tab:hover{opacity:1}
+.tab[aria-selected=true]{background:var(--ivory);color:var(--green);opacity:1}
+.tab .n{display:inline-block;margin-left:8px;font-family:var(--serif);font-style:italic;font-weight:400;opacity:.7}
+
+main{max-width:1100px;margin:0 auto;padding:clamp(24px,5vw,56px) clamp(14px,4vw,56px) 120px}
+.panel{display:none}.panel.on{display:block}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.head h2{font-family:var(--serif);font-weight:500;font-size:clamp(40px,6vw,72px);line-height:1;margin:0;letter-spacing:-.02em}
+.head p{margin:8px 0 0;color:var(--ivory-2);max-width:56ch}
+
+/* forms */
+.add{display:flex;gap:8px;width:100%;max-width:560px}
+.add input,.add select,.field{background:rgba(251,244,228,.08);border:1.5px solid rgba(251,244,228,.25);border-radius:999px;padding:12px 18px;color:var(--ivory);outline:none;min-width:0}
+.add input{flex:1}
+.add select{padding:0 14px}
+.add input::placeholder{color:rgba(251,244,228,.5)}
+.add input:focus{border-color:var(--pink-soft)}
+select option{color:var(--ink)}
+.btn{background:var(--pink);color:#fff;font-weight:700;border-radius:999px;padding:12px 20px;transition:transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;border:1.5px solid rgba(251,244,228,.35);color:var(--ivory);font-weight:600}
+.btn.small{padding:8px 14px;font-size:14px}
+.btn.ivory{background:var(--ivory);color:var(--green)}
+.seg{display:inline-flex;background:rgba(251,244,228,.1);border-radius:999px;padding:4px}
+.seg button{padding:8px 16px;border-radius:999px;font-weight:600;color:var(--ivory-2)}
+.seg button[aria-selected=true]{background:var(--ivory);color:var(--green)}
+
+/* lists */
+.group{margin-bottom:36px}
+.group h3{font-family:var(--serif);font-weight:400;font-style:italic;font-size:26px;color:var(--marigold);margin:0 0 12px;display:flex;align-items:baseline;gap:10px}
+.group h3 small{font-family:var(--sans);font-style:normal;font-size:14px;color:var(--ivory-2)}
+.group.skip h3{color:var(--ivory-2);cursor:pointer}
+.list{display:grid;gap:8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--ivory);color:var(--ink);border-radius:16px;padding:12px 14px 12px 16px}
+.item.done{background:var(--ivory-2);color:var(--ink-soft)}
+.item.done .t{text-decoration:line-through;text-decoration-color:var(--pink)}
+.check{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--green);display:grid;place-items:center;color:#fff}
+.item.done .check{background:var(--green);border-color:var(--green)}
+.item .t{flex:1;font-weight:500}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 8px;border-radius:999px;background:var(--green);color:var(--ivory);margin-left:8px;vertical-align:middle}
+.v{display:inline-flex;gap:2px;flex:none}
+.v button{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;opacity:.35}
+.v button:hover,.v button.on{opacity:1}
+.v .love.on{background:var(--pink);color:#fff}.v .like.on{background:var(--marigold);color:var(--ink)}.v .skip.on{background:var(--ink-soft);color:#fff}
+.x{flex:none;opacity:.35;font-size:20px;line-height:1;padding:0 4px;color:var(--ink)}
+.x:hover{opacity:1;color:var(--orange)}
+.empty{background:rgba(251,244,228,.07);border:1.5px dashed rgba(251,244,228,.3);border-radius:16px;padding:28px;color:var(--ivory-2);text-align:center}
+.empty b{color:var(--ivory)}
+
+/* sort game */
+.sorter{max-width:640px;margin:0 auto}
+.stage{position:relative;height:300px;margin-bottom:18px}
+.card{position:absolute;inset:0;background:var(--ivory);color:var(--ink);border-radius:26px;padding:32px 30px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 50px rgba(0,0,0,.35);touch-action:none;user-select:none;cursor:grab}
+.card.behind{transform:scale(.94) translateY(16px);opacity:.5;box-shadow:none;pointer-events:none}
+.card.drag{cursor:grabbing;transition:none}
+.card.fly{transition:transform .35s ease,opacity .35s;opacity:0}
+.card .ct{font-family:var(--serif);font-weight:500;font-size:clamp(24px,4vw,34px);line-height:1.15}
+.card .cm{display:flex;justify-content:space-between;align-items:center;color:var(--ink-soft);font-size:14px}
+.card .cm .tag{margin:0}
+.zones{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.zone{border-radius:20px;padding:22px 10px;text-align:center;font-weight:800;font-size:17px;border:2.5px dashed rgba(251,244,228,.35);transition:.15s;cursor:pointer}
+.zone small{display:block;font-weight:500;font-size:12px;opacity:.75;margin-top:2px}
+.zone.skip{color:var(--ivory-2)} .zone.like{color:var(--marigold)} .zone.love{color:var(--pink-soft)}
+.zone.hot.skip{background:var(--ink-soft);color:#fff;border-style:solid;transform:scale(1.04)}
+.zone.hot.like{background:var(--marigold);color:var(--ink);border-style:solid;transform:scale(1.04)}
+.zone.hot.love{background:var(--pink);color:#fff;border-style:solid;transform:scale(1.04)}
+.sorter .meta{display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:var(--ivory-2);font-size:14px}
+.donebox{background:var(--marigold);color:var(--ink);border-radius:26px;padding:36px 30px;text-align:center}
+.donebox h3{font-family:var(--serif);font-weight:500;font-size:34px;margin:0 0 8px}
+
+/* movies */
+.reel{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.ticket{position:relative;background:var(--ivory);color:var(--ink);border-radius:16px;padding:18px 16px 16px;min-height:120px;display:flex;flex-direction:column;justify-content:space-between}
+.ticket.done{background:var(--marigold)}
+.ticket .title{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.1;padding-right:20px}
+.ticket .meta{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;color:var(--ink-soft)}
+.ticket .x{position:absolute;top:8px;right:10px}
+.ticket .watched{background:var(--green);color:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.ticket.done .watched{background:var(--ink)}
+
+/* check-ins */
+.week{background:var(--ivory);color:var(--ink);border-radius:var(--r);padding:clamp(18px,3vw,32px);margin-bottom:22px}
+.week header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:18px}
+.week h3{font-family:var(--serif);font-weight:500;font-size:32px;margin:0;line-height:1}
+.week h3 span{font-style:italic;font-weight:300;color:var(--pink)}
+.grid{display:grid;grid-template-columns:150px 1fr 1fr;gap:1px;background:var(--ivory-2);border-radius:14px;overflow:hidden}
+.grid>div{background:var(--ivory);padding:12px 14px}
+.grid .lab{font-weight:700;color:var(--green)}
+.grid .lab small{display:block;font-weight:500;color:var(--ink-soft);font-size:12px;line-height:1.3;margin-top:2px}
+.grid .who{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--pink);background:var(--ivory-2)}
+.grid textarea{width:100%;border:0;background:transparent;resize:vertical;min-height:54px;padding:0;outline:none;line-height:1.45}
+.grid textarea:focus{background:#fff}
+.photo{margin-bottom:8px}
+.photo img{width:100%;max-height:260px;object-fit:cover;border-radius:10px;display:block;cursor:zoom-in;background:var(--ivory-2)}
+.photo .pa{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px}
+.photo .pa button{color:var(--ink-soft);text-decoration:underline}
+.upl{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:var(--ivory);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.upl input{display:none}
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr 1fr}
+  .grid .lab{grid-column:1/-1;background:var(--ivory-2);padding-top:14px}
+  .grid .lab small{display:inline;margin-left:6px}
+  .grid .who{display:none}
+  .stage{height:260px}
+}
+.lb{position:fixed;inset:0;background:rgba(15,43,34,.94);display:none;place-items:center;z-index:20;padding:20px;cursor:zoom-out}
+.lb.on{display:grid}
+.lb img{max-width:100%;max-height:100%;border-radius:12px}
+
+/* games */
+.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:var(--ivory);color:var(--ink);border-radius:var(--r);padding:clamp(18px,3vw,32px);margin-bottom:28px;text-align:center}
+.score .nm{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--pink)}
+.score .num{font-family:var(--serif);font-weight:600;font-size:clamp(56px,10vw,110px);line-height:1}
+.score .vs{color:var(--ink-soft);font-size:14px}
+.score .vs b{display:block;font-family:var(--serif);font-size:28px;color:var(--ink)}
+.score .lead{font-size:14px;color:var(--ink-soft)}
+.gform{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:24px}
+.gform .field{border-radius:14px;padding:11px 14px}
+.gform .field.date{color-scheme:dark}
+@media(max-width:700px){.gform{grid-template-columns:1fr 1fr}.gform .btn{grid-column:1/-1}}
+.glog{display:grid;gap:8px}
+.glog .item .d{font-size:13px;color:var(--ink-soft);min-width:56px}
+.glog .w{font-weight:800;color:var(--pink);flex:none}
+.glog .w.b{color:var(--green)}.glog .w.tie{color:var(--ink-soft)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+
+/* settings */
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:760px}
+.settings label{display:grid;gap:6px;font-size:14px;color:var(--ivory-2);font-weight:600}
+.settings input{background:rgba(251,244,228,.08);border:1.5px solid rgba(251,244,228,.25);border-radius:12px;padding:11px 14px;color:var(--ivory);outline:none}
+.settings input:focus{border-color:var(--pink-soft)}
+.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--ivory);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:30}
+.status.show{opacity:1}
+.status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--marigold);margin-right:8px}
+.status.live .dot{background:#5BD98A}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="cover" id="cover">
+  <img src="us.jpg" alt="The two of us">
+  <div class="veil"></div>
+  <div class="words">
+    <h1 id="coverTitle"></h1>
+    <p class="sub" id="coverSub"></p>
+    <div class="hq" id="coverHq"></div>
+  </div>
+  <a class="enter" href="#top" aria-label="Enter">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </a>
+</section>
+
+<div id="top"></div>
+<nav class="bar"><div class="tabs" role="tablist" id="tabs"></div></nav>
+
+<main>
+  <section class="panel" data-p="checkins">
+    <div class="head"><div><h2>This week</h2><p>One column each, every week. Photos go straight in from your phone.</p></div>
+      <button class="btn" onclick="addWeek()">Start a new week</button></div>
+    <div id="weeks"></div>
+  </section>
+
+  <section class="panel" data-p="bucket">
+    <div class="head"><div><h2>Bucket list</h2><p>Sort them first: drag each card to Skip, Like, or Love. Then the list groups itself.</p></div>
+      <div class="seg" id="bucketMode"></div></div>
+    <div id="bucketSort"></div>
+    <div id="bucketList"></div>
+  </section>
+
+  <section class="panel" data-p="dates">
+    <div class="head"><div><h2>Date nights</h2><p>Same game. Sort the ideas together, then pick from the Love pile when it's date night.</p></div>
+      <div class="seg" id="datesMode"></div></div>
+    <div id="datesSort"></div>
+    <div id="datesList"></div>
+  </section>
+
+  <section class="panel" data-p="movies">
+    <div class="head"><div><h2>Movies</h2><p>The watch-together list. Nobody watches one alone.</p></div>
+      <form class="add" onsubmit="return addItem(event,'movies')"><input placeholder="Add a movie" required><button class="btn">Add</button></form></div>
+    <div id="movies"></div>
+  </section>
+
+  <section class="panel" data-p="games">
+    <div class="head"><div><h2>Games</h2><p>Who's winning, what we played, and what's next.</p></div></div>
+    <div class="score" id="score"></div>
+    <form class="gform" onsubmit="return logGame(event)">
+      <input class="field" name="game" placeholder="What did we play?" required>
+      <select class="field" name="winner" id="winnerSel"></select>
+      <input class="field date" type="date" name="date">
+      <button class="btn">Log it</button>
+    </form>
+    <div class="cols">
+      <div><div class="group"><h3>Played</h3><div class="glog" id="glog"></div></div></div>
+      <div><div class="group"><h3>Up next</h3>
+        <form class="add" style="margin-bottom:10px" onsubmit="return addItem(event,'next')"><input placeholder="Add a game to play" required><button class="btn small">Add</button></form>
+        <div class="list" id="gnext"></div></div></div>
+    </div>
+  </section>
+
+  <section class="panel" data-p="settings">
+    <div class="head"><div><h2>Settings</h2><p>Names and the words on the cover. Everyone with the link sees these.</p></div></div>
+    <div class="settings">
+      <label>Name one<input data-s="a"></label>
+      <label>Name two<input data-s="b"></label>
+      <label style="grid-column:1/-1">Line under the photo<input data-s="caption"></label>
+      <label style="grid-column:1/-1">Pink label on the cover<input data-s="hq"></label>
+    </div>
+  </section>
+</main>
+
+<div class="lb" id="lb" onclick="this.classList.remove('on')"><img id="lbimg" alt=""></div>
+<div class="status" id="status"><span class="dot"></span><span id="statusText"></span></div>
+
+<script src="config.js"></script>
+<script>
+/* ================= CONFIG ================= */
+// Paste your Firebase web config here to sync between both of you.
+// Leave as null and the site keeps everything on this device only.
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;
+/* ========================================== */
+
+const PROMPTS=[
+  ['silly','Silly pic','the dumbest photo of your week',true],
+  ['pretty','Pretty pic','something beautiful you saw',true],
+  ['ate','Something I ate','best or worst, your call',true],
+  ['wish','Wished you were there','a moment that needed you in it',false],
+  ['challenge','Comfort-zone challenge','what you dared the other to do, and how it went',false],
+];
+const VERD={love:['Love it','♥'],like:['Like it','↑'],skip:['Skip it','×']};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const today=()=>new Date().toISOString().slice(0,10);
+const mondayOf=d=>{d=new Date(d);const k=(d.getDay()+6)%7;d.setDate(d.getDate()-k);return d.toISOString().slice(0,10)};
+const fmt=iso=>new Date(iso+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
+
+function seed(){
+  const B=(g,t)=>({id:uid(),g,t,done:false});
+  const D=(g,t)=>({id:uid(),g,t});
+  return {
+    settings:{a:'Nick',b:'Sue',caption:'Some time apart and everything we are building in the meantime',hq:'Our Dating Activity Center'},
+    weeks:[{id:uid(),week:mondayOf(new Date()),e:{},p:{}}],
+    bucket:[
+      B('Travel','Plan a trip where Sue picks the food and Nick picks the activities'),
+      B('Travel','Go somewhere neither of us has been, no itinerary, just wander'),
+      B('Travel','Recreate a meal from our favorite trip so far'),
+      B('Travel','Plan a weekend around one specific dish we both want to try'),
+      B('Food','Take a cooking class together in a city neither of us has been to'),
+      B('Food','Find a hole-in-the-wall restaurant with zero online reviews and rate it ourselves'),
+      B('Food','Cook the same recipe separately on a video call and compare'),
+      B('Food','Take a food tour in a new city'),
+      B('Food','Do a blind taste test (wine, coffee, hot sauce, anything)'),
+      B('Food','Cook a full meal from a country we haven\'t visited'),
+      B('Food','Find a local farmers market wherever we travel and cook with what we find'),
+      B('Games','Board game tournament weekend, best record wins a prize'),
+      B('Games','Learn a new board game neither of us has played'),
+      B('Games','Rematch of whatever game one of us is most smug about winning'),
+      B('Games','Take a class together neither of us is naturally good at'),
+    ],
+    movies:[],
+    games:{log:[],next:[]},
+    dates:[
+      D('Virtual','Cook the same recipe on a video call, then eat together'),
+      D('Virtual','Blind taste test: order the same snack or wine ahead and rate it live'),
+      D('Virtual','Watch party for a movie off the list (Teleparty, Kast)'),
+      D('Virtual','Plan one leg of a future trip on the call. Pull up a map, argue about where to eat'),
+      D('Virtual','Trade a comfort-zone dare for the week and report back next date night'),
+      D('Virtual','Online board game with a running series score (Codenames, Catan, Scrabble Go)'),
+      D('Virtual','Show and tell: pick one object in the room and tell the story behind it'),
+      D('Virtual','Order the same takeout in both cities and compare notes'),
+      D('Virtual','20 questions to learn something new about each other'),
+      D('Virtual','Read the same short story or article ahead of time and talk it through'),
+      D('Virtual','Karaoke over video, one song each, no judgment (lies)'),
+      D('Virtual','Plan next month\'s date nights together so there is always one on the calendar'),
+      D('Virtual','Cook a recipe neither of us has made before and narrate the disasters live'),
+      D('Virtual','Virtual museum tour, then debate favorite piece'),
+      D('Virtual','Trivia night, alternate who writes the questions'),
+      D('Themed','Passport Night: pick a country, cook a dish from there, learn one fact each'),
+      D('Themed','Iron Chef Night: same surprise ingredient, separate kitchens, judge each other'),
+      D('Themed','Game Show Night: turn a real trivia format into a head-to-head'),
+      D('Themed','Time Machine Night: dress for and cook food from a specific decade'),
+      D('Themed','No-Talking-About-Work Night, with a penalty if someone slips'),
+      D('Themed','Yes Night: say yes to whatever the other suggests, within reason'),
+      D('Themed','Budget Night: the whole date costs under $10 each'),
+      D('Themed','Swap Night: each plans a surprise for the other, revealed at the start'),
+      D('Themed','Debate Night: silly topic, opposite sides, no real stakes'),
+      D('Themed','Nostalgia Night: rewatch something from childhood and roast it'),
+      D('Themed','One Month Down Night: mark each month with something small'),
+      D('In person','A full tasting-menu dinner at home, courses split between us'),
+      D('In person','A weekend trip planned entirely around one meal'),
+      D('In person','A board game cafe or tournament in whatever city we\'re in'),
+      D('In person','A cooking class, in person, for real this time'),
+      D('In person','Food market crawl: one stall each, no repeats'),
+      D('In person','A day with zero phones, wherever we end up'),
+      D('In person','Revisit the first place we went together'),
+      D('In person','A competitive activity we\'re both bad at (mini golf, bowling, darts)'),
+      D('In person','A spontaneous day trip decided the morning of'),
+    ],
+  };
+}
+
+/* ---------- state + persistence ---------- */
+let S=null, db=null, remoteRef=null, applyingRemote=false, saveTimer=null;
+const KEY='us-v2';
+const MODE={bucket:'sort',dates:'sort'};
+function load(){try{const j=localStorage.getItem(KEY);if(j)return JSON.parse(j)}catch(e){}return null}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(remoteRef&&!applyingRemote){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>remoteRef.set(S).then(()=>flash('Saved for both of you',true)).catch(()=>flash('Could not sync, saved here')),400);
+  }
+  render();
+}
+function flash(t,live){const el=document.getElementById('status');document.getElementById('statusText').textContent=t;el.classList.toggle('live',!!live);el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800)}
+
+/* ---------- photos: Firestore docs or IndexedDB ---------- */
+const photoCache={};
+const idb={
+  open:()=>new Promise((res,rej)=>{const r=indexedDB.open('us-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}),
+  put:async(id,d)=>{const x=await idb.open();return new Promise((res,rej)=>{const t=x.transaction('p','readwrite');t.objectStore('p').put(d,id);t.oncomplete=res;t.onerror=()=>rej(t.error)})},
+  get:async id=>{const x=await idb.open();return new Promise((res,rej)=>{const r=x.transaction('p').objectStore('p').get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
+};
+async function putPhoto(id,d){photoCache[id]=d;if(db)await db.collection('photos').doc(id).set({d});else await idb.put(id,d)}
+async function getPhoto(id){if(photoCache[id])return photoCache[id];let d=null;try{if(db){const s=await db.collection('photos').doc(id).get();d=s.exists?s.data().d:null}else d=await idb.get(id)}catch(e){}if(d)photoCache[id]=d;return d}
+function shrink(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const M=1100;let w=img.width,h=img.height;const k=Math.min(1,M/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',.74))};img.src=URL.createObjectURL(file)})}
+async function addPhoto(input,wid,key,who){
+  const f=input.files[0];if(!f)return;flash('Adding photo…');
+  const d=await shrink(f);const id=uid();
+  try{await putPhoto(id,d)}catch(e){flash('Photo could not be saved');return}
+  const w=S.weeks.find(x=>x.id===wid);w.p=w.p||{};w.p[key]=w.p[key]||['',''];w.p[key][who]=id;save();
+}
+function removePhoto(wid,key,who){const w=S.weeks.find(x=>x.id===wid);if(w&&w.p&&w.p[key]){w.p[key][who]='';save()}}
+function viewPhoto(src){document.getElementById('lbimg').src=src;document.getElementById('lb').classList.add('on')}
+function hydratePhotos(){document.querySelectorAll('img[data-pid]').forEach(async im=>{const d=await getPhoto(im.dataset.pid);if(d)im.src=d})}
+
+/* ---------- actions ---------- */
+function addItem(ev,col){
+  ev.preventDefault();const f=ev.target;const t=f.querySelector('input').value.trim();if(!t)return false;
+  const g=f.querySelector('select')?.value;const it={id:uid(),t};if(g)it.g=g;
+  if(col==='next'){it.done=false;S.games.next.unshift(it)}else{if(col!=='dates')it.done=false;S[col].unshift(it)}
+  f.reset();save();return false;
+}
+const coll=col=>col==='next'?S.games.next:S[col];
+function toggle(col,id){const it=coll(col).find(x=>x.id===id);if(it){it.done=!it.done;save()}}
+function del(col,id){if(!confirm('Remove this?'))return;if(col==='next')S.games.next=S.games.next.filter(x=>x.id!==id);else S[col]=S[col].filter(x=>x.id!==id);save()}
+function verdict(col,id,v){const it=S[col].find(x=>x.id===id);if(!it)return;it.v=(it.v===v&&MODE[col]==='list')?undefined:v;lastSort={col,id};save()}
+let lastSort=null;
+function undoSort(){if(!lastSort)return;const it=S[lastSort.col].find(x=>x.id===lastSort.id);if(it)it.v=undefined;lastSort=null;save()}
+function setMode(col,m){MODE[col]=m;render()}
+function addWeek(){
+  const last=S.weeks[0]?.week||mondayOf(new Date());const d=new Date(last+'T12:00:00');d.setDate(d.getDate()+7);
+  S.weeks.unshift({id:uid(),week:d.toISOString().slice(0,10),e:{},p:{}});save();
+}
+function delWeek(id){if(!confirm('Remove this whole week?'))return;S.weeks=S.weeks.filter(w=>w.id!==id);save()}
+function setEntry(wid,key,who,val){const w=S.weeks.find(x=>x.id===wid);if(!w)return;w.e[key]=w.e[key]||['',''];w.e[key][who]=val;save()}
+function setSetting(k,v){S.settings[k]=v;save()}
+function logGame(ev){ev.preventDefault();const f=ev.target;S.games.log.unshift({id:uid(),game:f.game.value.trim(),winner:f.winner.value,date:f.date.value||today()});f.game.value='';save();return false}
+function delGame(id){if(!confirm('Remove this game?'))return;S.games.log=S.games.log.filter(g=>g.id!==id);save()}
+function show(p){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.dataset.p===p));document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.p===p));try{localStorage.setItem(KEY+':tab',p)}catch(e){}}
+
+/* ---------- drag to sort ---------- */
+function wireDrag(card,col,id){
+  let sx=0,sy=0,dragging=false;
+  const zones=[...card.parentElement.parentElement.querySelectorAll('.zone')];
+  const hot=z=>zones.forEach(x=>x.classList.toggle('hot',x===z));
+  const zoneAt=(x,y)=>zones.find(z=>{const r=z.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom});
+  card.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;sy=e.clientY;card.setPointerCapture(e.pointerId);card.classList.add('drag')});
+  card.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-sx,dy=e.clientY-sy;card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/25}deg)`;hot(zoneAt(e.clientX,e.clientY))});
+  const end=e=>{if(!dragging)return;dragging=false;card.classList.remove('drag');const z=zoneAt(e.clientX,e.clientY);hot(null);
+    if(z){card.classList.add('fly');card.style.transform+=' translateY(140px) scale(.8)';setTimeout(()=>verdict(col,id,z.dataset.v),220)}else{card.style.transform=''}};
+  card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end);
+}
+
+/* ---------- render ---------- */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const linkify=s=>esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">link</a>');
+
+function renderSorter(col){
+  const items=S[col].filter(x=>!x.v);const total=S[col].length;
+  const el=document.getElementById(col+'Sort');
+  if(!items.length){el.innerHTML=`<div class="sorter"><div class="donebox"><h3>All ${total} sorted.</h3><p>Now go do the Love pile.</p><button class="btn" onclick="setMode('${col}','list')">See the list</button></div></div>`;return}
+  const [a,b]=items;
+  el.innerHTML=`<div class="sorter"><div class="stage">
+    ${b?`<div class="card behind"><div class="ct">${esc(b.t)}</div></div>`:''}
+    <div class="card" id="${col}Card"><div class="ct">${esc(a.t)}</div><div class="cm"><span class="tag">${esc(a.g)}</span><span>drag it, or tap a pile</span></div></div></div>
+    <div class="zones">
+      <div class="zone skip" data-v="skip" onclick="verdict('${col}','${a.id}','skip')">Skip it<small>not for us</small></div>
+      <div class="zone like" data-v="like" onclick="verdict('${col}','${a.id}','like')">Like it<small>sure, someday</small></div>
+      <div class="zone love" data-v="love" onclick="verdict('${col}','${a.id}','love')">Love it<small>we're doing this</small></div>
+    </div>
+    <div class="meta"><span>${items.length} left of ${total}</span>${lastSort&&lastSort.col===col?`<button class="btn ghost small" onclick="undoSort()">Undo last</button>`:'<span></span>'}</div></div>`;
+  wireDrag(document.getElementById(col+'Card'),col,a.id);
+}
+function renderSorted(col){
+  const el=document.getElementById(col+'List');const order=['love','like',null,'skip'];const names={love:'Love it',like:'Like it',null:'Not sorted yet',skip:'Skip it'};
+  const rows=v=>S[col].filter(x=>(x.v||null)===v).sort((p,q)=>(p.g||'').localeCompare(q.g||''));
+  const vbtns=x=>`<span class="v">${Object.entries(VERD).map(([k,[l,s]])=>`<button class="${k} ${x.v===k?'on':''}" title="${l}" onclick="verdict('${col}','${x.id}','${k}')">${s}</button>`).join('')}</span>`;
+  el.innerHTML=order.map(v=>{const r=rows(v);if(!r.length)return'';const skip=v==='skip';
+    return `<div class="group ${skip?'skip':''}"><h3 ${skip?`onclick="this.parentElement.classList.toggle('open')"`:''}>${names[v]}<small>${r.length}${skip?' · tap to show':''}</small></h3><div class="list" ${skip?'style="display:none"':''}>${r.map(x=>`<div class="item ${x.done?'done':''}">${'done'in x?`<button class="check" onclick="toggle('${col}','${x.id}')" aria-label="Done">${x.done?'✓':''}</button>`:''}<div class="t">${linkify(x.t)}<span class="tag">${esc(x.g||'')}</span></div>${vbtns(x)}<button class="x" onclick="del('${col}','${x.id}')" aria-label="Remove">×</button></div>`).join('')}</div></div>`}).join('')||`<div class="empty"><b>Nothing here yet.</b></div>`;
+  el.querySelectorAll('.group.skip h3').forEach(h=>h.addEventListener('click',()=>{const l=h.nextElementSibling;l.style.display=l.style.display==='none'?'':'none'}));
+}
+function renderCol(col,addPh,g){
+  const left=S[col].filter(x=>!x.v).length;
+  document.getElementById(col+'Mode').innerHTML=`<button aria-selected="${MODE[col]==='sort'}" onclick="setMode('${col}','sort')">Sort${left?` (${left})`:''}</button><button aria-selected="${MODE[col]==='list'}" onclick="setMode('${col}','list')">The list</button>`;
+  const sortEl=document.getElementById(col+'Sort'),listEl=document.getElementById(col+'List');
+  if(MODE[col]==='sort'){listEl.innerHTML='';renderSorter(col)}else{sortEl.innerHTML=`<form class="add" style="margin-bottom:24px" onsubmit="return addItem(event,'${col}')"><input placeholder="${addPh}" required><select name="g">${g.map(x=>`<option>${x}</option>`).join('')}</select><button class="btn">Add</button></form>`;renderSorted(col)}
+}
+
+function render(){
+  const st=S.settings;
+  document.getElementById('coverTitle').innerHTML=`${esc(st.a)} <em>&amp;</em> ${esc(st.b)}`;
+  document.getElementById('coverSub').textContent=st.caption;
+  const hq=document.getElementById('coverHq');hq.textContent=st.hq;hq.style.display=st.hq?'':'none';
+  document.title=`${st.a} & ${st.b}`;
+  const tabs=[['checkins','This week',S.weeks.length],['bucket','Bucket list',S.bucket.filter(x=>x.v==='love'&&!x.done).length],['dates','Date nights',S.dates.filter(x=>x.v==='love').length],['movies','Movies',S.movies.filter(x=>!x.done).length],['games','Games',S.games.log.length],['settings','Settings','']];
+  document.getElementById('tabs').innerHTML=tabs.map(([p,l,n])=>`<button class="tab" role="tab" data-p="${p}" onclick="show('${p}')">${l}${n?`<span class="n">${n}</span>`:''}</button>`).join('');
+  const ae=document.activeElement;
+  if(!ae||ae.tagName!=='TEXTAREA'){
+    document.getElementById('weeks').innerHTML=S.weeks.map(w=>`<div class="week"><header><h3>Week of <span>${fmt(w.week)}</span></h3><button class="btn ghost small" onclick="delWeek('${w.id}')">Remove week</button></header>
+      <div class="grid"><div class="who"></div><div class="who">${esc(st.a)}</div><div class="who">${esc(st.b)}</div>
+      ${PROMPTS.map(([k,l,h,ph])=>`<div class="lab">${l}<small>${h}</small></div>`+[0,1].map(i=>{const pid=((w.p||{})[k]||['',''])[i];
+        return `<div>${ph?(pid?`<div class="photo"><img data-pid="${pid}" alt="" onclick="viewPhoto(this.src)"><div class="pa"><button onclick="removePhoto('${w.id}','${k}',${i})">remove photo</button></div></div>`
+          :`<div class="photo"><label class="upl">+ Photo<input type="file" accept="image/*" onchange="addPhoto(this,'${w.id}','${k}',${i})"></label></div>`):''}<textarea placeholder="${esc([st.a,st.b][i])}" onchange="setEntry('${w.id}','${k}',${i},this.value)">${esc((w.e[k]||['',''])[i])}</textarea></div>`}).join('')).join('')}
+      </div></div>`).join('')||`<div class="empty"><b>No weeks yet.</b> Start one above.</div>`;
+    hydratePhotos();
+  }
+  renderCol('bucket','Add something',['Travel','Food','Games','Other']);
+  renderCol('dates','Add an idea',['Virtual','Themed','In person']);
+  document.getElementById('movies').innerHTML=S.movies.length?`<div class="reel">${S.movies.map(m=>`<div class="ticket ${m.done?'done':''}"><div class="title">${esc(m.t)}</div><div class="meta"><span>${m.done?'Watched':'Up next'}</span><button class="watched" onclick="toggle('movies','${m.id}')">${m.done?'Unwatch':'We watched it'}</button></div><button class="x" onclick="del('movies','${m.id}')" aria-label="Remove">×</button></div>`).join('')}</div>`
+    :`<div class="empty"><b>The list is empty.</b> Each of you add one to start.</div>`;
+  // games
+  const L=S.games.log,wa=L.filter(g=>g.winner==='a').length,wb=L.filter(g=>g.winner==='b').length,ties=L.length-wa-wb;
+  const lead=wa===wb?'Dead even':(wa>wb?st.a:st.b)+' leads by '+Math.abs(wa-wb);
+  document.getElementById('score').innerHTML=`<div><div class="nm">${esc(st.a)}</div><div class="num">${wa}</div></div><div class="vs">${L.length} played<b>vs</b>${ties} tie${ties===1?'':'s'}<div class="lead">${lead}</div></div><div><div class="nm">${esc(st.b)}</div><div class="num">${wb}</div></div>`;
+  document.getElementById('winnerSel').innerHTML=`<option value="a">${esc(st.a)} won</option><option value="b">${esc(st.b)} won</option><option value="tie">Tie</option>`;
+  document.getElementById('glog').innerHTML=L.length?L.map(g=>`<div class="item"><span class="d">${fmt(g.date)}</span><div class="t">${esc(g.game)}</div><span class="w ${g.winner}">${g.winner==='tie'?'Tie':esc(g.winner==='a'?st.a:st.b)}</span><button class="x" onclick="delGame('${g.id}')">×</button></div>`).join(''):`<div class="empty"><b>Nothing logged.</b> Play something.</div>`;
+  document.getElementById('gnext').innerHTML=S.games.next.length?S.games.next.map(x=>`<div class="item ${x.done?'done':''}"><button class="check" onclick="toggle('next','${x.id}')">${x.done?'✓':''}</button><div class="t">${esc(x.t)}</div><button class="x" onclick="del('next','${x.id}')">×</button></div>`).join(''):`<div class="empty">Add games you want to try.</div>`;
+  if(!ae||!ae.dataset?.s){document.querySelectorAll('[data-s]').forEach(i=>{i.value=st[i.dataset.s]||''})}
+}
+document.querySelectorAll('[data-s]').forEach(i=>i.addEventListener('change',()=>setSetting(i.dataset.s,i.value)));
+
+/* ---------- boot ---------- */
+S=load()||seed();
+S.games=S.games||{log:[],next:[]};
+render();
+show((()=>{try{return localStorage.getItem(KEY+':tab')}catch(e){}})()||'checkins');
+
+if(FIREBASE_CONFIG){
+  const add=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+  (async()=>{
+    try{
+      await add('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+      await add('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
+      firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore();
+      remoteRef=db.collection('log').doc('main');
+      const snap=await remoteRef.get();
+      if(snap.exists){applyingRemote=true;S=snap.data();S.games=S.games||{log:[],next:[]};render();applyingRemote=false}else{await remoteRef.set(S)}
+      remoteRef.onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;applyingRemote=true;S=s.data();S.games=S.games||{log:[],next:[]};try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render();applyingRemote=false});
+      flash('Live: synced for both of you',true);
+    }catch(e){console.error(e);flash('Sync unavailable, saving on this device')}
+  })();
+}
+</script>
+</body>
+</html>
