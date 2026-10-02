@@ -312,12 +312,12 @@ select option{color:var(--ink)}
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-<script src="config.js"></script>
+<script src="config.js?v=2"></script>
 <script>
 /* ================= CONFIG ================= */
 // Paste your Firebase web config here to sync between both of you.
 // Leave as null and the site keeps everything on this device only.
-const FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {apiKey:"AIzaSyAKis8w2ITZzptsQDMAnDC5LozFC1P1s0Q",authDomain:"nick-sue.firebaseapp.com",databaseURL:"https://nick-sue-default-rtdb.firebaseio.com",projectId:"nick-sue",appId:"1:240060694124:web:01763c7cc5b0a550322249"};
 /* ========================================== */
 
 const PROMPTS=[
