@@ -398,6 +398,7 @@ let S=null, db=null, remoteRef=null, applyingRemote=false, saveTimer=null;
 const KEY='us-v2';
 function load(){try{const j=localStorage.getItem(KEY);if(j)return JSON.parse(j)}catch(e){}return null}
 function save(){
+  if(!applyingRemote)S.updated=Date.now();
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
   if(remoteRef&&!applyingRemote){
     clearTimeout(saveTimer);
@@ -414,8 +415,9 @@ const idb={
   put:async(id,d)=>{const x=await idb.open();return new Promise((res,rej)=>{const t=x.transaction('p','readwrite');t.objectStore('p').put(d,id);t.oncomplete=res;t.onerror=()=>rej(t.error)})},
   get:async id=>{const x=await idb.open();return new Promise((res,rej)=>{const r=x.transaction('p').objectStore('p').get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
 };
-async function putPhoto(id,d){photoCache[id]=d;if(db)await db.collection('photos').doc(id).set({d});else await idb.put(id,d)}
-async function getPhoto(id){if(photoCache[id])return photoCache[id];let d=null;try{if(db){const s=await db.collection('photos').doc(id).get();d=s.exists?s.data().d:null}else d=await idb.get(id)}catch(e){}if(d)photoCache[id]=d;return d}
+let RTB='';
+async function putPhoto(id,d){photoCache[id]=d;try{await idb.put(id,d)}catch(e){}if(RTB){const r=await fetch(RTB+'/photos/'+id+'.json',{method:'PUT',body:JSON.stringify(d)});if(!r.ok)throw new Error(r.status)}}
+async function getPhoto(id){if(photoCache[id])return photoCache[id];let d=null;try{d=await idb.get(id)}catch(e){}if(!d&&RTB){try{d=await (await fetch(RTB+'/photos/'+id+'.json')).json()}catch(e){}}if(d)photoCache[id]=d;return d}
 function shrink(file){return new Promise(res=>{const img=new Image();img.onload=()=>{const M=1100;let w=img.width,h=img.height;const k=Math.min(1,M/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',.74))};img.src=URL.createObjectURL(file)})}
 async function addPhoto(input,wid,key,who){
   const f=input.files[0];if(!f)return;flash('Adding photo…');
@@ -590,20 +592,19 @@ render();
 loadWorld();
 show((()=>{try{return localStorage.getItem(KEY+':tab')}catch(e){}})()||'checkins');
 
-if(FIREBASE_CONFIG){
-  const add=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
-  (async()=>{
-    try{
-      await add('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-      await add('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
-      firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore();
-      remoteRef=db.collection('log').doc('main');
-      const snap=await remoteRef.get();
-      if(snap.exists){applyingRemote=true;S=normalize(snap.data());render();applyingRemote=false}else{await remoteRef.set(S)}
-      remoteRef.onSnapshot(s=>{if(!s.exists||s.metadata.hasPendingWrites)return;applyingRemote=true;S=normalize(s.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render();applyingRemote=false});
-      flash('Live: synced for both of you',true);
-    }catch(e){console.error(e);flash('Sync unavailable, saving on this device')}
-  })();
+if(FIREBASE_CONFIG&&FIREBASE_CONFIG.databaseURL){
+  const RT=FIREBASE_CONFIG.databaseURL.replace(/\/$/,'');RTB=RT;let lastJson='';
+  remoteRef={set:v=>{const json=JSON.stringify(v);lastJson=json;return fetch(RT+'/state.json',{method:'PUT',body:JSON.stringify({json,updated:v.updated||0})}).then(r=>{if(!r.ok)throw new Error(r.status)})}};
+  const apply=d=>{if(!d||!d.json||d.json===lastJson)return;lastJson=d.json;applyingRemote=true;try{S=normalize(JSON.parse(d.json));localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render();applyingRemote=false};
+  (async()=>{try{
+    const d=await (await fetch(RT+'/state.json')).json();
+    if(d&&d.json&&(!S.updated||(d.updated||0)>=S.updated)){apply(d)}else{await remoteRef.set(S);
+      S.weeks.forEach(w=>Object.values(w.p||{}).flat().filter(Boolean).forEach(async id=>{try{const p=await idb.get(id);if(p)fetch(RT+'/photos/'+id+'.json',{method:'PUT',body:JSON.stringify(p)})}catch(e){}}))}
+    const es=new EventSource(RT+'/state.json');
+    const on=e=>{try{const m=JSON.parse(e.data);if(m.path==='/')apply(m.data);else fetch(RT+'/state.json').then(r=>r.json()).then(apply)}catch(_){}};
+    es.addEventListener('put',on);es.addEventListener('patch',on);
+    flash('Live: synced for both of you',true);
+  }catch(e){console.error(e);remoteRef=null;RTB='';flash('Sync unavailable, saving on this device')}})();
 }
 </script>
 </body>
