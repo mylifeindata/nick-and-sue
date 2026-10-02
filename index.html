@@ -215,6 +215,16 @@ select option{color:var(--ink)}
 .card2 .note{font-size:13px;color:var(--ivory-2);margin:0 0 12px}
 .card2 .vlabel{font-size:14px;margin-bottom:8px}
 
+/* passphrase gate */
+.gate{position:fixed;inset:0;background:rgba(12,35,64,.94);display:none;place-items:center;z-index:60;padding:20px}
+.gate.on{display:grid}
+.gatebox{background:var(--ivory);color:var(--ink);border-radius:var(--r);padding:28px;max-width:380px;width:100%;display:grid;gap:10px}
+.gatebox h3{font-family:var(--serif);font-weight:500;font-size:30px;margin:0;color:var(--green)}
+.gatebox p{margin:0;font-size:14px;color:var(--ink-soft)}
+.gatebox input{border:1.5px solid var(--ivory-2);border-radius:12px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;outline:none}
+.gatebox input:focus{border-color:var(--pink)}
+.gatebox .err{color:var(--orange);min-height:1em;font-weight:600}
+
 /* settings */
 .settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:760px}
 .settings label{display:grid;gap:6px;font-size:14px;color:var(--ivory-2);font-weight:600}
@@ -303,11 +313,13 @@ select option{color:var(--ink)}
       <label>Name two<input data-s="b"></label>
       <label style="grid-column:1/-1">Line under the photo<input data-s="caption"></label>
       <label style="grid-column:1/-1">Pink label on the cover<input data-s="hq"></label>
+      <div style="grid-column:1/-1"><button class="btn ghost small" type="button" onclick="forgetPass()">Re-enter passphrase on this device</button></div>
     </div>
   </section>
 </main>
 
 <div class="lb" id="lb" onclick="this.classList.remove('on')"><img id="lbimg" alt=""></div>
+<div class="gate" id="gate"><form class="gatebox"><h3>Our passphrase</h3><p>Type the passphrase you two picked. This device will remember it, so you only do this once.</p><input type="password" placeholder="Passphrase" autocomplete="current-password"><input type="password" placeholder="Type it again" autocomplete="current-password"><button class="btn">Unlock</button><p class="err"></p></form></div>
 <div class="status" id="status"><span class="dot"></span><span id="statusText"></span></div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -592,20 +604,34 @@ render();
 loadWorld();
 show((()=>{try{return localStorage.getItem(KEY+':tab')}catch(e){}})()||'checkins');
 
-if(FIREBASE_CONFIG&&FIREBASE_CONFIG.databaseURL){
-  const RT=FIREBASE_CONFIG.databaseURL.replace(/\/$/,'');RTB=RT;let lastJson='';
+const PASSKEY='us-pass';
+async function spaceId(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('nick-sue:'+p.trim().toLowerCase()));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function askPass(){return new Promise(res=>{const m=document.getElementById('gate');const f=m.querySelector('form');const [a,b]=f.querySelectorAll('input');const err=f.querySelector('.err');m.classList.add('on');setTimeout(()=>a.focus(),50);
+  f.onsubmit=e=>{e.preventDefault();const v=a.value.trim();if(!v){err.textContent='Type the passphrase first.';return}if(v.toLowerCase()!==b.value.trim().toLowerCase()){err.textContent='Those two don\'t match. Try again.';return}m.classList.remove('on');res(v)}})}
+function forgetPass(){if(!confirm('Re-enter the passphrase on this device?'))return;try{localStorage.removeItem(PASSKEY)}catch(e){}location.reload()}
+if(FIREBASE_CONFIG&&FIREBASE_CONFIG.databaseURL){(async()=>{
+  const ROOT=FIREBASE_CONFIG.databaseURL.replace(/\/$/,'');
+  let pass=null;try{pass=localStorage.getItem(PASSKEY)}catch(e){}
+  if(!pass){pass=await askPass();try{localStorage.setItem(PASSKEY,pass)}catch(e){}}
+  const RT=ROOT+'/spaces/'+(await spaceId(pass));RTB=RT;let lastJson='';
   remoteRef={set:v=>{const json=JSON.stringify(v);lastJson=json;return fetch(RT+'/state.json',{method:'PUT',body:JSON.stringify({json,updated:v.updated||0})}).then(r=>{if(!r.ok)throw new Error(r.status)})}};
   const apply=d=>{if(!d||!d.json||d.json===lastJson)return;lastJson=d.json;applyingRemote=true;try{S=normalize(JSON.parse(d.json));localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render();applyingRemote=false};
-  (async()=>{try{
-    const d=await (await fetch(RT+'/state.json')).json();
+  try{
+    let d=await (await fetch(RT+'/state.json')).json();
+    if(!d||!d.json){
+      try{const old=await (await fetch(ROOT+'/state.json')).json();
+        if(old&&old.json){const w=await fetch(RT+'/state.json',{method:'PUT',body:JSON.stringify(old)});
+          if(w.ok){const ph=await (await fetch(ROOT+'/photos.json')).json();if(ph&&!ph.error)await fetch(RT+'/photos.json',{method:'PUT',body:JSON.stringify(ph)});
+            await fetch(ROOT+'/state.json',{method:'DELETE'});await fetch(ROOT+'/photos.json',{method:'DELETE'});d=old}}}catch(e){}
+    }
     if(d&&d.json&&(!S.updated||(d.updated||0)>=S.updated)){apply(d)}else{await remoteRef.set(S);
       S.weeks.forEach(w=>Object.values(w.p||{}).flat().filter(Boolean).forEach(async id=>{try{const p=await idb.get(id);if(p)fetch(RT+'/photos/'+id+'.json',{method:'PUT',body:JSON.stringify(p)})}catch(e){}}))}
     const es=new EventSource(RT+'/state.json');
     const on=e=>{try{const m=JSON.parse(e.data);if(m.path==='/')apply(m.data);else fetch(RT+'/state.json').then(r=>r.json()).then(apply)}catch(_){}};
     es.addEventListener('put',on);es.addEventListener('patch',on);
     flash('Live: synced for both of you',true);
-  }catch(e){console.error(e);remoteRef=null;RTB='';flash('Sync unavailable, saving on this device')}})();
-}
+  }catch(e){console.error(e);remoteRef=null;RTB='';flash('Sync unavailable, saving on this device')}
+})()}
 </script>
 </body>
 </html>
